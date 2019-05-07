@@ -4,10 +4,11 @@ from boggle_cl_interface import BoggleInterface
 
 class Boggle:
 
-    def __init__(self, grid_size, rounds, interface=None,  scoring_model=None, max_players=None):
+    def __init__(self, grid_size, max_rounds, interface=None,  scoring_model=None, max_players=None):
         self.board = Board(grid_size)
         self.players = []
-        self.rounds = rounds
+        self.max_rounds = max_rounds
+        self.current_round = 0
         self.interface = interface
         if not self.interface:
             self.interface = BoggleInterface(game_instance=self)
@@ -24,9 +25,11 @@ class Boggle:
             self.players.append(Player(name=name))
 
     def run_game(self):
-        while self.rounds > 0:
+        for player in self.players:
+            player.build_score_dict(self.max_rounds)
+        while self.current_round < self.max_rounds:
             self.run_round()
-            self.rounds -= 1
+            self.current_round += 1
             self.board.shuffle_cubes()
             self.board.shake_cubes()
         return max(self.players, key=lambda x: x.score)
@@ -34,6 +37,7 @@ class Boggle:
     def run_round(self):
         for player in self.players:
             self.run_turn(player)
+        self.score_round()
 
     def run_turn(self, active_player):
         self.interface.display_board()
@@ -42,7 +46,7 @@ class Boggle:
         trace_words = self.handle_qu(words)
         for idx, word in enumerate(words):
             if self.find_word(trace_words[idx]):
-                active_player.score += self.score_word(word)
+                active_player.words[self.current_round][word] = self.score_word(word)
 
     def handle_qu(self, words):
         return ['@'.join(word.split('qu')) for word in words]
@@ -79,12 +83,26 @@ class Boggle:
                 if self.trace_path(word[1:], neighbor, consumed_spaces | {neighbor}):
                     return True
 
+    def score_round(self):
+        for player in self.players:
+            for word in player.words[self.current_round]:
+                if word in set(sum([list(x.words[self.current_round].keys()) for x in self.players if x is not player], [])):
+                    player.words[self.current_round][word] = 0
+            player.compute_score(self.current_round)
+
 
 class Player:
 
     def __init__(self, name):
         self.name = name
+        self.words = {}
         self.score = 0
+
+    def build_score_dict(self, max_rounds):
+        self.words = {x: {} for x in range(max_rounds)}
+
+    def compute_score(self, current_round):
+        self.score += sum(self.words[current_round].values())
 
 
 class Board:
@@ -99,9 +117,7 @@ class Board:
             self.populate_spaces()
 
     def populate_spaces(self):
-        #Run this method only once!
-        self.shuffle_cubes()
-        self.shake_cubes()
+        # Run this method only once!
         count = 0
         for y in range(self.grid_size):
             row = []
@@ -144,7 +160,7 @@ class Space:
                 if self.x_coord + x not in range(len(board)):
                     continue
                 self.adjacents.append(board[self.y_coord + y][self.x_coord + x])
-        self.adjacents = [x for x in self.adjacents if x is not self]
+        self.adjacents.remove(self)
 
     def __str__(self):
         return self.cube.top_letter_lc
@@ -168,6 +184,6 @@ class Cube:
 
 
 if __name__ == '__main__':
-    game = Boggle(grid_size=30, rounds=3)
+    game = Boggle(grid_size=6, max_rounds=3)
     game.add_players()
     game.run_game()
