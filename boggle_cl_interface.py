@@ -21,3 +21,7 @@ class BoggleInterface:
             name = input(f'Player {i + 1}, what name would you like to use? ')
             names.append(name)
         return names
+
+    def print_all_words(self, words):
+        print(f'''All possible words: {words}
+                  Total:  {len(words)}''')
