@@ -36,8 +36,6 @@ class Boggle:
     def run_game(self):
         for player in self.players:
             player.build_score_dict(self.max_rounds)
-        #Shaking the cubes initially performs the mapping operation of Qu to @ for cube.top_letter_lc
-        self.board.shake_cubes()
         while self.current_round < self.max_rounds:
             self.run_round()
             self.current_round += 1
@@ -136,6 +134,7 @@ class Board:
                 count += 1
             self.spaces.append(row)
         self.generate_adjacents()
+        self.shake_cubes()
 
     def generate_adjacents(self):
         for row in self.spaces:
@@ -195,6 +194,6 @@ class Cube:
 
 
 if __name__ == '__main__':
-    game = Boggle(grid_size=4, max_rounds=3)
+    game = Boggle(grid_size=7, max_rounds=3)
     game.add_players()
     game.run_game()
