@@ -4,7 +4,8 @@ from boggle_cl_interface import BoggleInterface
 
 class Boggle:
 
-    def __init__(self, grid_size, max_rounds, interface=None,  scoring_model=None, max_players=None):
+    def __init__(self, grid_size, max_rounds, interface=None,  scoring_model=None, max_players=None, dictionary=None):
+        self.grid_size = grid_size
         self.board = Board(grid_size)
         self.players = []
         self.max_rounds = max_rounds
@@ -16,8 +17,16 @@ class Boggle:
         if not self.scoring_model:
             self.scoring_model = [(0, 0), (3, 1), (4, 1), (5, 2), (6, 3), (7, 5), (8, 11)]
         self.max_players = max_players
-        if not max_players:
+        if not self.max_players:
             self.max_players = 2
+        self.dictionary = dictionary
+        if not self.dictionary:
+            self.dictionary = 'boggle_words.txt'
+        self.boggle_words = self.build_boggle_words()
+
+    def build_boggle_words(self):
+        words = open(self.dictionary, 'r').read().split('\n')
+        return {x for x in words if self.scoring_model[1][0] <= len(x) <= self.grid_size ** 2 + 1}
 
     def add_players(self):
         names = self.interface.get_player_names()
@@ -27,6 +36,8 @@ class Boggle:
     def run_game(self):
         for player in self.players:
             player.build_score_dict(self.max_rounds)
+        #Shaking the cubes initially performs the mapping operation of Qu to @ for cube.top_letter_lc
+        self.board.shake_cubes()
         while self.current_round < self.max_rounds:
             self.run_round()
             self.current_round += 1
@@ -45,18 +56,18 @@ class Boggle:
         words = self.interface.get_words(active_player)
         trace_words = self.handle_qu(words)
         for idx, word in enumerate(words):
-            if self.find_word(trace_words[idx]):
+            if self.find_word(words[idx], trace_words[idx]):
                 active_player.words[self.current_round][word] = self.score_word(word)
 
     def handle_qu(self, words):
         return ['@'.join(word.split('qu')) for word in words]
 
-    def find_word(self, word):
+    def find_word(self, word, trace_word):
         if not self.check_if_valid_english(word=word):
             return False
         for row in self.board.spaces:
             for space in row:
-                if self.trace_path(word, space, set()):
+                if self.trace_path(trace_word, space, set()):
                     return True
         return False
 
@@ -73,7 +84,8 @@ class Boggle:
     def check_if_valid_english(self, word):
         if not word:
             return False
-        return True
+        else:
+            return word in self.boggle_words
 
     def score_word(self, word):
         for idx, tup in enumerate(self.scoring_model):
