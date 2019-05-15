@@ -61,10 +61,10 @@ class Boggle:
         return False
 
     def trace_path(self, word, space, consumed_spaces):
-        if len(word) == 1 and word == space.cube.top_letter_lc:
-            return True
-        elif word[0] != space.cube.top_letter_lc:
+        if word[0] != space.cube.top_letter_lc:
             return False
+        elif len(word) == 1:
+            return True
         else:
             for neighbor in filter(lambda x: x not in consumed_spaces, space.adjacents):
                 if self.trace_path(word[1:], neighbor, consumed_spaces | {space}):
