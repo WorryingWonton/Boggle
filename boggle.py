@@ -54,13 +54,21 @@ class Boggle:
     def find_word(self, word):
         if not self.check_if_valid_english(word=word):
             return False
-        flm_spaces = []
         for row in self.board.spaces:
-            flm_spaces += [space for space in row if space.cube.top_letter_lc == word[0]]
-        for space in flm_spaces:
-            if self.trace_path(word, space, set()):
-                return True
+            for space in row:
+                if self.trace_path(word, space, set()):
+                    return True
         return False
+
+    def trace_path(self, word, space, consumed_spaces):
+        if len(word) == 1 and word == space.cube.top_letter_lc:
+            return True
+        elif word[0] != space.cube.top_letter_lc:
+            return False
+        else:
+            for neighbor in filter(lambda x: x not in consumed_spaces, space.adjacents):
+                if self.trace_path(word[1:], neighbor, consumed_spaces | {space}):
+                    return True
 
     def check_if_valid_english(self, word):
         if not word:
@@ -72,16 +80,6 @@ class Boggle:
             if len(word) < tup[0]:
                 return self.scoring_model[idx - 1][1]
         return self.scoring_model[-1][1]
-
-    def trace_path(self, word, space, consumed_spaces):
-        if not word:
-            return True
-        elif word[0] != space.cube.top_letter_lc:
-            return False
-        else:
-            for neighbor in filter(lambda x: x not in consumed_spaces, space.adjacents):
-                if self.trace_path(word[1:], neighbor, consumed_spaces | {neighbor}):
-                    return True
 
     def score_round(self):
         for player in self.players:
@@ -139,7 +137,8 @@ class Board:
         self.cubes = random.sample(self.cubes, k=len(self.cubes))
 
     def shake_cubes(self):
-        [x.roll_cube() for x in self.cubes]
+        for x in self.cubes:
+            x.roll_cube()
 
 
 class Space:

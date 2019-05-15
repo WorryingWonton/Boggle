@@ -11,8 +11,9 @@ class TestBoggle(unittest.TestCase):
         game_instance = self.map_tls_to_board(game_instance, test_board)
         my_string = 'nssn'
         words = []
-        #This test will fail if uncommented.
-        # self.assertEqual(False, game_instance.find_word('sss'))
+        self.assertEqual(False, game_instance.find_word('sss'))
+        self.assertEqual(False, game_instance.find_word('ssnnn'))
+        self.assertEqual(False, game_instance.find_word('nnn'))
         for r in range(1, 5):
             words += [''.join(x) for x in list(permutations(my_string, r=r))]
         for word in words:
