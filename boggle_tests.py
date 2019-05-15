@@ -6,9 +6,6 @@ from math import sqrt
 #Unit Test specific version of Boggle which overrides check_if_valid_english(), but is otherwise unaltered.
 class UTBoggle(Boggle):
 
-    def check_if_valid_english(self, word):
-        return len(word) > 0
-
     def find_word(self, word, trace_word):
         for row in self.board.spaces:
             for space in row:
