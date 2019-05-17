@@ -17,7 +17,7 @@ class UTBoggle(Boggle):
 class TestBoggle(unittest.TestCase):
 
     def test_find_word_2x2(self):
-        game_instance = UTBoggle(grid_size=2, max_rounds=1)
+        game_instance = UTBoggle(grid_size=(2, 2), max_rounds=1)
         test_board = self.generate_test_board('NSSN')
         game_instance = self.map_tls_to_board(game_instance, test_board)
         my_string = 'nssn'
@@ -34,13 +34,13 @@ class TestBoggle(unittest.TestCase):
         pass
 
     def test_find_word_4x4(self):
-        game_instance = UTBoggle(grid_size=4, max_rounds=1)
+        game_instance = UTBoggle(grid_size=[4, 4], max_rounds=1)
         test_board = self.generate_test_board('MPOWXYZTFABCNLSH')
         game_instance = self.map_tls_to_board(game_instance, test_board)
         word = 'mpow'
         self.assertEqual(True, game_instance.find_word(None, word))
         tb_2 = self.generate_test_board('BZ@IXRIFJCEMPTRA')
-        gi_2 = UTBoggle(grid_size=4, max_rounds=1)
+        gi_2 = UTBoggle(grid_size=[4, 4], max_rounds=1)
         gi_2 = self.map_tls_to_board(gi_2, tb_2)
         self.assertEqual(True, gi_2.find_word(None, '@iz'))
         self.assertEqual(True, gi_2.find_word(None, 'art'))
@@ -48,7 +48,7 @@ class TestBoggle(unittest.TestCase):
         self.assertEqual(True, gi_2.find_word(None, 'bz@ii'))
 
     def test_boggle_score_round(self):
-        game_instance = UTBoggle(max_rounds=3, grid_size=5)
+        game_instance = UTBoggle(max_rounds=3, grid_size=[5, 5])
         game_instance.players = [Player(name='ll'), Player(name='kk')]
         game_instance.players[0].words = {0: {'hello': 2, 'hiii': 1}, 1: {'hey': 1, 'there': 2}, 2: {'soo': 1, 'what': 1}}
         game_instance.players[1].words = {0: {'hello': 2, 'xxxxxx': 3}, 1: {'hey': 1, 'tharr': 2}, 2: {'soo': 1, 'nutttt': 3}}

@@ -5,7 +5,8 @@ from boggle_cl_interface import BoggleInterface
 class Boggle:
 
     def __init__(self, grid_size, max_rounds, interface=None,  scoring_model=None, max_players=None, dictionary=None):
-        self.grid_size = grid_size
+        self.x_width = grid_size[0]
+        self.y_width = grid_size[1]
         self.board = Board(grid_size)
         self.players = []
         self.max_rounds = max_rounds
@@ -26,7 +27,7 @@ class Boggle:
 
     def build_boggle_words(self):
         words = open(self.dictionary, 'r').read().split('\n')
-        return {x for x in words if self.scoring_model[1][0] <= len(x) <= self.grid_size ** 2 + 1}
+        return {x for x in words if self.scoring_model[1][0] <= len(x) <= 2 * self.x_width * self.y_width}
 
     def add_players(self):
         names = self.interface.get_player_names()
@@ -117,6 +118,8 @@ class Board:
 
     def __init__(self, grid_size):
         self.grid_size = grid_size
+        self.x_width = grid_size[0]
+        self.y_width = grid_size[1]
         self.spaces = []
         self.cubes = []
         if not self.cubes:
@@ -127,9 +130,9 @@ class Board:
     def populate_spaces(self):
         # Run this method only once!
         count = 0
-        for y in range(self.grid_size):
+        for y in range(self.y_width):
             row = []
-            for x in range(self.grid_size):
+            for x in range(self.x_width):
                 row.append(Space(x_coord=x, y_coord=y, cube=self.cubes[count]))
                 count += 1
             self.spaces.append(row)
@@ -139,10 +142,10 @@ class Board:
     def generate_adjacents(self):
         for row in self.spaces:
             for space in row:
-                space.find_adjacents(board=self.spaces)
+                space.find_adjacents(board=self)
 
     def make_cubes(self):
-        self.cubes = [x() for x in [Cube]*(self.grid_size ** 2)]
+        self.cubes = [x() for x in [Cube]*(self.x_width * self.y_width)]
 
     def shuffle_cubes(self):
         self.cubes = random.sample(self.cubes, k=len(self.cubes))
@@ -164,12 +167,12 @@ class Space:
 
     def find_adjacents(self, board):
         for y in [1, 0, -1]:
-            if self.y_coord + y not in range(len(board)):
+            if self.y_coord + y not in range(board.y_width):
                 continue
             for x in [1, 0, -1]:
-                if self.x_coord + x not in range(len(board)):
+                if self.x_coord + x not in range(board.x_width):
                     continue
-                self.adjacents.append(board[self.y_coord + y][self.x_coord + x])
+                self.adjacents.append(board.spaces[self.y_coord + y][self.x_coord + x])
         self.adjacents.remove(self)
 
     def __str__(self):
@@ -194,6 +197,6 @@ class Cube:
 
 
 if __name__ == '__main__':
-    game = Boggle(grid_size=7, max_rounds=3)
+    game = Boggle(grid_size=(7, 4), max_rounds=3)
     game.add_players()
     game.run_game()
