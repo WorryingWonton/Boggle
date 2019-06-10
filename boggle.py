@@ -56,13 +56,9 @@ class Boggle:
         self.interface.display_board()
         self.interface.display_scores()
         words = self.interface.get_words(active_player)
-        trace_words = self.handle_qu(words)
         for idx, word in enumerate(words):
-            if self.find_word(words[idx], trace_words[idx]):
+            if self.find_word(words[idx], words[idx]):
                 active_player.words[self.current_round][word] = self.score_word(word)
-
-    def handle_qu(self, words):
-        return ['@'.join(word.split('qu')) for word in words]
 
     def find_word(self, word, trace_word):
         if not self.check_if_valid_english(word=word):
@@ -74,13 +70,13 @@ class Boggle:
         return False
 
     def trace_path(self, word, space, consumed_spaces):
-        if word[0] != space.cube.top_letter_lc:
+        if word[:len(space.cube.top_letter_lc)] != space.cube.top_letter_lc:
             return False
-        elif len(word) == 1:
+        elif word == space.cube.top_letter_lc:
             return True
         else:
             for neighbor in filter(lambda x: x not in consumed_spaces, space.adjacents):
-                if self.trace_path(word[1:], neighbor, consumed_spaces | {space}):
+                if self.trace_path(word[len(space.cube.top_letter_lc):], neighbor, consumed_spaces | {space}):
                     return True
 
     def check_if_valid_english(self, word):
@@ -197,11 +193,11 @@ class Cube:
 
     def roll_cube(self):
         self.top_letter = self.letters[random.randrange(6)]
-        self.top_letter_lc = self.top_letter.lower() if self.top_letter != 'Qu' else '@'
+        self.top_letter_lc = self.top_letter.lower()
 
 
 if __name__ == '__main__':
-    game = Boggle(grid_size=(10, 10), max_rounds=3, max_players=1)
+    game = Boggle(grid_size=(5, 5), max_rounds=3, max_players=1)
     game.add_players()
     game.run_game()
 
