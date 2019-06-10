@@ -2,6 +2,9 @@ import random
 import string
 from boggle_cl_interface import BoggleInterface
 
+#Make the cubes a command line argument, using a \n delimited text file populated with 6 character strings
+#See https://boardgames.stackexchange.com/questions/29264/boggle-what-is-the-dice-configuration-for-boggle-in-various-languages
+
 class Boggle:
 
     def __init__(self, grid_size, max_rounds, interface=None,  scoring_model=None, max_players=None, dictionary=None):
@@ -128,7 +131,6 @@ class Board:
             self.populate_spaces()
 
     def populate_spaces(self):
-        # Run this method only once!
         count = 0
         for y in range(self.y_width):
             row = []
@@ -189,7 +191,9 @@ class Cube:
         self.top_letter_lc = self.letters[0].lower()
 
     def generate_letters(self):
-        self.letters = list(map(lambda x: x + 'u' if x == 'Q' else x, random.choices(string.ascii_uppercase, k=6)))
+        weights = [6, 2, 2, 3, 11, 2, 2, 5, 6, 1, 1, 4, 2, 6, 7, 2, 1, 5, 6, 9, 3, 2, 3, 1, 3, 1]
+        letters = random.choices(string.ascii_uppercase, k=6, weights=weights)
+        self.letters = list(map(lambda x: x + 'u' if x == 'Q' else x, letters))
 
     def roll_cube(self):
         self.top_letter = self.letters[random.randrange(6)]
@@ -197,6 +201,7 @@ class Cube:
 
 
 if __name__ == '__main__':
-    game = Boggle(grid_size=(7, 4), max_rounds=3)
+    game = Boggle(grid_size=(4, 4), max_rounds=3, max_players=1)
     game.add_players()
     game.run_game()
+
