@@ -2,8 +2,6 @@ import random
 import string
 from boggle_cl_interface import BoggleInterface
 
-#Make the cubes a command line argument, using a \n delimited text file populated with 6 character strings
-#See https://boardgames.stackexchange.com/questions/29264/boggle-what-is-the-dice-configuration-for-boggle-in-various-languages
 
 class Boggle:
 
@@ -197,7 +195,6 @@ class Cube:
 
 
 if __name__ == '__main__':
-    game = Boggle(grid_size=(5, 5), max_rounds=3, max_players=1)
+    game = Boggle(grid_size=(10, 10), max_rounds=3, max_players=1)
     game.add_players()
     game.run_game()
-
