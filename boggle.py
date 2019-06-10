@@ -201,7 +201,7 @@ class Cube:
 
 
 if __name__ == '__main__':
-    game = Boggle(grid_size=(4, 4), max_rounds=3, max_players=1)
+    game = Boggle(grid_size=(10, 10), max_rounds=3, max_players=1)
     game.add_players()
     game.run_game()
 

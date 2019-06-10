@@ -5,7 +5,13 @@ class BoggleInterface:
 
     def display_board(self):
         for row in self.game_instance.board.spaces:
-            print(' '.join([x.cube.top_letter for x in row]))
+            r_string = ''
+            for space in row:
+                if space.cube.top_letter == 'Qu':
+                    r_string += space.cube.top_letter + ' '
+                else:
+                    r_string += space.cube.top_letter + '  '
+            print(r_string)
 
     def display_scores(self):
         [print(f'{x.name}: {x.score}') for x in self.game_instance.players]
