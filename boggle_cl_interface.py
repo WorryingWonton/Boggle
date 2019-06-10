@@ -18,7 +18,7 @@ class BoggleInterface:
 
     def get_words(self, player):
         words = input(f'{player.name}, please enter all the words you can find in the above grid, separated by a space: ')
-        return [word.lower() for word in words.split()]
+        return [word.upper() for word in words.split()]
 
     def get_player_names(self):
         names = []

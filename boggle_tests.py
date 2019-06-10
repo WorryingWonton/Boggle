@@ -20,11 +20,11 @@ class TestBoggle(unittest.TestCase):
         game_instance = UTBoggle(grid_size=(2, 2), max_rounds=1)
         test_board = self.generate_test_board('NSSN')
         game_instance = self.map_tls_to_board(game_instance, test_board)
-        my_string = 'nssn'
+        my_string = 'NSSN'
         words = []
-        self.assertEqual(False, game_instance.find_word(None, 'sss'))
-        self.assertEqual(False, game_instance.find_word(None, 'ssnnn'))
-        self.assertEqual(False, game_instance.find_word(None, 'nnn'))
+        self.assertEqual(False, game_instance.find_word(None, 'SSS'))
+        self.assertEqual(False, game_instance.find_word(None, 'SSSNN'))
+        self.assertEqual(False, game_instance.find_word(None, 'NNN'))
         for r in range(1, 5):
             words += [''.join(x) for x in list(permutations(my_string, r=r))]
         for word in words:
@@ -37,15 +37,15 @@ class TestBoggle(unittest.TestCase):
         game_instance = UTBoggle(grid_size=[4, 4], max_rounds=1)
         test_board = self.generate_test_board('MPOWXYZTFABCNLSH')
         game_instance = self.map_tls_to_board(game_instance, test_board)
-        word = 'mpow'
+        word = 'MPOW'
         self.assertEqual(True, game_instance.find_word(None, word))
         tb_2 = self.generate_test_board('BZ@IXRIFJCEMPTRA')
         gi_2 = UTBoggle(grid_size=[4, 4], max_rounds=1)
         gi_2 = self.map_tls_to_board(gi_2, tb_2)
-        self.assertEqual(True, gi_2.find_word(None, '@iz'))
-        self.assertEqual(True, gi_2.find_word(None, 'art'))
-        self.assertEqual(True, gi_2.find_word(None, 'ptjc'))
-        self.assertEqual(True, gi_2.find_word(None, 'bz@ii'))
+        self.assertEqual(True, gi_2.find_word(None, '@IZ'))
+        self.assertEqual(True, gi_2.find_word(None, 'ART'))
+        self.assertEqual(True, gi_2.find_word(None, 'PTJC'))
+        self.assertEqual(True, gi_2.find_word(None, 'BZ@II'))
 
     def test_boggle_score_round(self):
         game_instance = UTBoggle(max_rounds=3, grid_size=[5, 5])

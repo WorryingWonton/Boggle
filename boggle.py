@@ -59,7 +59,7 @@ class Boggle:
                 active_player.words[self.current_round][word] = self.score_word(word)
 
     def find_word(self, word, trace_word):
-        if not self.check_if_valid_english(word=word):
+        if not self.check_if_valid_english(word=word.lower()):
             return False
         for row in self.board.spaces:
             for space in row:
@@ -68,13 +68,13 @@ class Boggle:
         return False
 
     def trace_path(self, word, space, consumed_spaces):
-        if word[:len(space.cube.top_letter_lc)] != space.cube.top_letter_lc:
+        if word[:len(space.cube.top_letter)] != space.cube.top_letter:
             return False
-        elif word == space.cube.top_letter_lc:
+        elif word == space.cube.top_letter:
             return True
         else:
             for neighbor in filter(lambda x: x not in consumed_spaces, space.adjacents):
-                if self.trace_path(word[len(space.cube.top_letter_lc):], neighbor, consumed_spaces | {space}):
+                if self.trace_path(word[len(space.cube.top_letter):], neighbor, consumed_spaces | {space}):
                     return True
 
     def check_if_valid_english(self, word):
@@ -172,7 +172,7 @@ class Space:
         self.adjacents.remove(self)
 
     def __str__(self):
-        return self.cube.top_letter_lc
+        return self.cube.top_letter
 
 
 class Cube:
@@ -182,7 +182,6 @@ class Cube:
         if not self.letters:
             self.generate_letters()
         self.top_letter = self.letters[0]
-        self.top_letter_lc = self.letters[0].lower()
 
     def generate_letters(self):
         weights = [6, 2, 2, 3, 11, 2, 2, 5, 6, 1, 1, 4, 2, 6, 7, 2, 1, 5, 6, 9, 3, 2, 3, 1, 3, 1]
@@ -191,10 +190,9 @@ class Cube:
 
     def roll_cube(self):
         self.top_letter = self.letters[random.randrange(6)]
-        self.top_letter_lc = self.top_letter.lower()
 
 
 if __name__ == '__main__':
-    game = Boggle(grid_size=(10, 10), max_rounds=3, max_players=1)
+    game = Boggle(grid_size=(4, 4), max_rounds=3, max_players=1)
     game.add_players()
     game.run_game()
