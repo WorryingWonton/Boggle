@@ -43,6 +43,7 @@ class Boggle:
             self.current_round += 1
             self.board.shuffle_cubes()
             self.board.shake_cubes()
+        self.interface.display_final_scores()
         return max(self.players, key=lambda x: x.score)
 
     def run_round(self):
@@ -171,9 +172,6 @@ class Space:
                 self.adjacents.append(board.spaces[self.y_coord + y][self.x_coord + x])
         self.adjacents.remove(self)
 
-    def __str__(self):
-        return self.cube.top_letter
-
 
 class Cube:
 
@@ -193,6 +191,6 @@ class Cube:
 
 
 if __name__ == '__main__':
-    game = Boggle(grid_size=(4, 4), max_rounds=3, max_players=1)
+    game = Boggle(grid_size=(10, 10), max_rounds=3, max_players=2)
     game.add_players()
     game.run_game()

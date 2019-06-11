@@ -31,3 +31,7 @@ class BoggleInterface:
     def print_all_words(self, words):
         print(f'''All possible words: {words}
                   Total:  {len(words)}''')
+
+    def display_final_scores(self):
+        for player in self.game_instance.players:
+            print(f'{player.name}: {player.score} - {player.words}')
