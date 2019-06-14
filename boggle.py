@@ -69,9 +69,9 @@ class Boggle:
         return False
 
     def trace_path(self, word, space, consumed_spaces):
-        if word[:len(space.cube.top_letter)] != space.cube.top_letter:
+        if word[:len(space.cube.top_letter)] != space.cube.top_letter.upper():
             return False
-        elif word == space.cube.top_letter:
+        elif word == space.cube.top_letter.upper():
             return True
         else:
             for neighbor in filter(lambda x: x not in consumed_spaces, space.adjacents):
@@ -191,6 +191,6 @@ class Cube:
 
 
 if __name__ == '__main__':
-    game = Boggle(grid_size=(10, 10), max_rounds=3, max_players=2)
+    game = Boggle(grid_size=(10, 10), max_rounds=3, max_players=1)
     game.add_players()
     game.run_game()
