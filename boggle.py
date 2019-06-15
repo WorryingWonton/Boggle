@@ -56,15 +56,15 @@ class Boggle:
         self.interface.display_scores()
         words = self.interface.get_words(active_player)
         for idx, word in enumerate(words):
-            if self.find_word(words[idx], words[idx]):
+            if self.find_word(words[idx]):
                 active_player.words[self.current_round][word] = self.score_word(word)
 
-    def find_word(self, word, trace_word):
+    def find_word(self, word):
         if not self.check_if_valid_english(word=word.lower()):
             return False
         for row in self.board.spaces:
             for space in row:
-                if self.trace_path(trace_word, space, set()):
+                if self.trace_path(word, space, set()):
                     return True
         return False
 
@@ -198,6 +198,6 @@ class Cube:
 
 
 if __name__ == '__main__':
-    game = Boggle(grid_size=(10, 10), max_rounds=3, max_players=1)
+    game = Boggle(grid_size=(8, 8), max_rounds=3, max_players=1)
     game.add_players()
     game.run_game()
