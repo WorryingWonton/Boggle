@@ -41,6 +41,7 @@ class Boggle:
             self.run_round()
             self.current_round += 1
             self.board.shuffle_cubes()
+            self.board.reassign_cubes()
             self.board.shake_cubes()
         self.interface.display_final_scores()
         return max(self.players, key=lambda x: x.score)
@@ -145,6 +146,13 @@ class Board:
 
     def shuffle_cubes(self):
         self.cubes = random.sample(self.cubes, k=len(self.cubes))
+
+    def reassign_cubes(self):
+        count = 0
+        for row in self.spaces:
+            for space in row:
+                space.cube = self.cubes[count]
+                count += 1
 
     def shake_cubes(self):
         for x in self.cubes:
