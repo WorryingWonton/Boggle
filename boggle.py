@@ -34,10 +34,9 @@ class Boggle:
         names = self.interface.get_player_names()
         for name in names:
             self.players.append(Player(name=name))
+            self.players[-1].build_score_dict(max_rounds=self.max_rounds)
 
     def run_game(self):
-        for player in self.players:
-            player.build_score_dict(self.max_rounds)
         while self.current_round < self.max_rounds:
             self.run_round()
             self.current_round += 1
