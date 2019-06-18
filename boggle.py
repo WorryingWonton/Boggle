@@ -92,8 +92,9 @@ class Boggle:
 
     def score_round(self):
         for player in self.players:
+            op_words = sum([list(x.words[self.current_round].keys()) for x in self.players if x is not player], [])
             for word in player.words[self.current_round]:
-                if word in sum([list(x.words[self.current_round].keys()) for x in self.players if x is not player], []):
+                if word in op_words:
                     player.words[self.current_round][word] = 0
             player.compute_score(self.current_round)
 
@@ -198,6 +199,6 @@ class Cube:
 
 
 if __name__ == '__main__':
-    game = Boggle(grid_size=(8, 8), max_rounds=3, max_players=1)
+    game = Boggle(grid_size=(20, 8), max_rounds=1, max_players=2)
     game.add_players()
     game.run_game()
