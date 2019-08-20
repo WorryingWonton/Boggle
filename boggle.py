@@ -1,5 +1,4 @@
 import random
-import string
 from boggle_cl_interface import BoggleInterface
 
 
@@ -190,15 +189,16 @@ class Cube:
         self.top_letter = self.letters[0]
 
     def generate_letters(self):
-        weights = [6, 2, 2, 3, 11, 2, 2, 5, 6, 1, 1, 4, 2, 6, 7, 2, 1, 5, 6, 9, 3, 2, 3, 1, 3, 1]
-        letters = random.choices(string.ascii_uppercase, k=6, weights=weights)
-        self.letters = list(map(lambda x: x + 'u' if x == 'Q' else x, letters))
+        alphabet = {'A': 6, 'B': 2, 'C': 2, 'D': 3, 'E': 11, 'F': 2, 'G': 2, 'H': 5, 'I': 6, 'J': 1, 'K': 1, 'L': 4,
+                    'M': 2, 'N': 6, 'O': 7, 'P': 2, 'Qu': 1, 'R': 5, 'S': 6, 'T': 9, 'U': 3, 'V': 2, 'W': 3, 'X': 1,
+                    'Y': 3, 'Z': 1}
+        self.letters = random.choices(list(alphabet.keys()), k=6, weights=list(alphabet.values()))
 
     def roll_cube(self):
         self.top_letter = self.letters[random.randrange(6)]
 
 
 if __name__ == '__main__':
-    game = Boggle(grid_size=(20, 8), max_rounds=1, max_players=2)
+    game = Boggle(grid_size=(12, 20), max_rounds=3, max_players=1)
     game.add_players()
     game.run_game()
