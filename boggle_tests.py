@@ -1,5 +1,6 @@
 import unittest
-from boggle import Boggle, Board, BoggleInterface
+from boggle import Boggle
+from itertools import permutations
 
 """
 I want to fully validate my Boggle code.
@@ -37,34 +38,30 @@ class TestIfValidBoggle(unittest.TestCase):
         -A word can be found consisting of letters in a horizontal line.
         -A word can be found consisting of letters in a vertical line.
         -A word can be found consisting of diagonal letters
-        -(2+c)x(2+r) behavior (any board with non-edge/corner spaces)
+        -Rectangular Board behavior
             -2x2
+            -2x(n + 2)
+            -(n + 2)x2
             -3x3
-            -4x4
-            -6x6
-            -3x4
-            -4x3
-            -1x5
-            -5x1
-            -10x2
-            -2x10
+            -3x(n + 3)
+            -(n + 3)x3
         -A word can be found using a combination of horizontal, vertical, and diagonal moves
         -A word will not be counted if it uses the same letter on the board more than once
         -A word will not be counted if part of it is not on the board
     """
     def test_single_letter_board(self):
         test_string = 'A'
-        boggle_instance = HelperMethods.configure_board_for_test(test_string, TestableBoggle((1, 1), 1))
+        boggle_instance = HelperMethods.configure_board_for_test(test_string, TestableBoggle((1, 1), 1, dictionary='test_words.txt'))
         self.assertEqual(True, boggle_instance.find_word(test_string))
 
     def test_find_single_letter_amongst_many(self):
         test_string = 'ABCDEFGHIJKLMNOP'
-        boggle_instance = HelperMethods.configure_board_for_test(test_string, TestableBoggle((4, 4), 1))
+        boggle_instance = HelperMethods.configure_board_for_test(test_string, TestableBoggle((4, 4), 1, dictionary='test_words.txt'))
         for char in test_string:
             self.assertEqual(True, boggle_instance.find_word(char))
 
     def test_find_multi_character_top_letter(self):
-        boggle_instance = TestableBoggle((5, 5), 1)
+        boggle_instance = TestableBoggle((5, 5), 1, dictionary='test_words.txt')
         boggle_instance.board.spaces[2][4].cube.top_letter = 'Quack'
         self.assertEqual(True, boggle_instance.find_word('QUACK'))
 
@@ -75,7 +72,7 @@ class TestIfValidBoggle(unittest.TestCase):
             -Verifies a word must be fully on the board
         """
         test_string = 'abcdefghij'
-        boggle_instance = HelperMethods.configure_board_for_test(test_string, TestableBoggle((10, 1), 1))
+        boggle_instance = HelperMethods.configure_board_for_test(test_string, TestableBoggle((10, 1), 1, dictionary='test_words.txt'))
         self.assertEqual(True, boggle_instance.find_word(test_string.upper()))
         self.assertEqual(True, boggle_instance.find_word('DEF'))
         self.assertEqual(False, boggle_instance.find_word('CC'))
@@ -88,7 +85,7 @@ class TestIfValidBoggle(unittest.TestCase):
             -Checks top to bottom
             -Verifies a word must be fully on the board"""
         test_string = 'abcdefghij'
-        boggle_instance = HelperMethods.configure_board_for_test(test_string, TestableBoggle((1, 10), 1))
+        boggle_instance = HelperMethods.configure_board_for_test(test_string, TestableBoggle((1, 10), 1, dictionary='test_words.txt'))
         self.assertEqual(True, boggle_instance.find_word(test_string.upper()))
         self.assertEqual(True, boggle_instance.find_word('DEF'))
         self.assertEqual(False, boggle_instance.find_word('CC'))
@@ -97,7 +94,7 @@ class TestIfValidBoggle(unittest.TestCase):
 
     def test_find_diagonal_letters(self):
         test_string = 'abcdefghijklmnopqrstuvwxy'
-        boggle_instance = HelperMethods.configure_board_for_test(test_string, TestableBoggle((5, 5), 1))
+        boggle_instance = HelperMethods.configure_board_for_test(test_string, TestableBoggle((5, 5), 1, dictionary='test_words.txt'))
         # [['a', 'b', 'c', 'd', 'e'],
         #  ['f', 'g', 'h', 'i', 'j'],
         #  ['k', 'l', 'm', 'n', 'o'],
@@ -112,6 +109,102 @@ class TestIfValidBoggle(unittest.TestCase):
         self.assertEqual(False, boggle_instance.find_word('AAGMSY'))
         self.assertEqual(False, boggle_instance.find_word('SMGG'))
         self.assertEqual(False, boggle_instance.find_word('SSMG'))
+
+    def test_find_multi_directional_arrangements(self):
+        test_string = 'aabbccddeeffgghhiijjkkllm'
+        boggle_instance = HelperMethods.configure_board_for_test(test_string, TestableBoggle((5, 5), 1, dictionary='test_words.txt'))
+        # [['a', 'a', 'b', 'b', 'c'],
+        #  ['c', 'd', 'd', 'e', 'e'],
+        #  ['f', 'f', 'g', 'g', 'h'],
+        #  ['h', 'i', 'i', 'j', 'j'],
+        #  ['k', 'k', 'l', 'l', 'm']]
+        self.assertEqual(True, boggle_instance.find_word('ADDAB'))
+        self.assertEqual(True, boggle_instance.find_word('ADDBA'))
+        self.assertEqual(True, boggle_instance.find_word('FIIGEG'))
+        self.assertEqual(True, boggle_instance.find_word('AABBCEEHGIJMLLIKHFC'))
+        self.assertEqual(False, boggle_instance.find_word('AABBCEEHGIJMLLIKHFCA'))
+        self.assertEqual(False, boggle_instance.find_word('AABBCEEHGIJMLLIKHFCM'))
+        self.assertEqual(False, boggle_instance.find_word('AABBCC'))
+        self.assertEqual(False, boggle_instance.find_word('AABBB'))
+
+    def test_2x2(self):
+        test_string = 'ABCD'
+        test_words = sum([[''.join(x) for x in list(permutations(test_string, r=r))] for r in range(1, 5)], [])
+        boggle_instance = HelperMethods.configure_board_for_test(test_string, TestableBoggle((2, 2), 1, dictionary='test_words.txt'))
+        for word in test_words:
+            self.assertEqual(True, boggle_instance.find_word(word))
+        self.assertEqual(False, boggle_instance.find_word('ABDD'))
+        self.assertEqual(False, boggle_instance.find_word('DABA'))
+
+    def test_10x2(self):
+        test_string = 'aabbccddeeffgghhiijj'
+        boggle_instance = HelperMethods.configure_board_for_test(test_string, TestableBoggle((10, 2), 1, dictionary='test_words.txt'))
+        # [['a', 'a', 'b', 'b', 'c', 'c', 'd', 'd', 'e', 'e'],
+        #  ['f', 'f', 'g', 'g', 'h', 'h', 'i', 'i', 'j', 'j']]
+        self.assertEqual(True, boggle_instance.find_word('AABBCCDDEEJJIIHHGGFF'))
+        self.assertEqual(True, boggle_instance.find_word('AFFABGGBCHHCDIIDEJJE'))
+        self.assertEqual(True, boggle_instance.find_word('AFFABGGBCHHCIDIDEJEJ'))
+        self.assertEqual(False, boggle_instance.find_word('AAGFFB'))
+        self.assertEqual(False, boggle_instance.find_word('AAGGF'))
+        self.assertEqual(False, boggle_instance.find_word('AAGGBBFFF'))
+
+    def test_2x10(self):
+        test_string = 'abcdefghijklmnopqrst'
+        boggle_instance = HelperMethods.configure_board_for_test(test_string, TestableBoggle((2, 10), 1, dictionary='test_words.txt'))
+        # [['a', 'b'],
+        #  ['c', 'd'],
+        #  ['e', 'f'],
+        #  ['g', 'h'],
+        #  ['i', 'j'],
+        #  ['k', 'l'],
+        #  ['m', 'n'],
+        #  ['o', 'p'],
+        #  ['q', 'r'],
+        #  ['s', 't']]
+        self.assertEqual(True, boggle_instance.find_word('ACEGIKMOQSTRPNLJHFDB'))
+        self.assertEqual(True, boggle_instance.find_word(test_string.upper()))
+        self.assertEqual(True, boggle_instance.find_word('ACBDEHFGJILKNPMORSTQ'))
+        self.assertEqual(False, boggle_instance.find_word('CBDAEHFGJILKNPMORSTQ'))
+        self.assertEqual(False, boggle_instance.find_word('ACBDEHFGJILKNPMORSTQS'))
+
+    def test_3x3(self):
+        test_string = 'abcdefghi'
+        boggle_instance = HelperMethods.configure_board_for_test(test_string, TestableBoggle((3, 3), 1, dictionary='test_words.txt'))
+        self.assertEqual(True, boggle_instance.find_word('ABCFEDGHI'))
+        self.assertEqual(True, boggle_instance.find_word('EABCFIHG'))
+        self.assertEqual(False, boggle_instance.find_word('IHGA'))
+        self.assertEqual(False, boggle_instance.find_word('IHGC'))
+        self.assertEqual(False, boggle_instance.find_word('IHGG'))
+
+    def test_10x3(self):
+        test_stirng = 'abcdefghijklmnopqrst0123456789'
+        # [['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j'],
+        #  ['k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't'],
+        #  ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9']]
+        boggle_instance = HelperMethods.configure_board_for_test(test_stirng, TestableBoggle((10, 3), 1, dictionary='test_words.txt'))
+        self.assertEqual(True, boggle_instance.find_word('abcdefghijsrqponmlk0123456789'.upper()))
+        self.assertEqual(True, boggle_instance.find_word('LAK012MCB'))
+        self.assertEqual(True, boggle_instance.find_word('DOPEN3'))
+        self.assertEqual(False, boggle_instance.find_word('DOPEN5'))
+
+    def test_3x10(self):
+        test_stirng = 'abcdefghijklmnopqrst0123456789'
+        # [['a', 'b', 'c'],
+        #  ['d', 'e', 'f'],
+        #  ['g', 'h', 'i'],
+        #  ['j', 'k', 'l'],
+        #  ['m', 'n', 'o'],
+        #  ['p', 'q', 'r'],
+        #  ['s', 't', '0'],
+        #  ['1', '2', '3'],
+        #  ['4', '5', '6'],
+        #  ['7', '8', '9']]
+        boggle_instance = HelperMethods.configure_board_for_test(test_stirng, TestableBoggle((3, 10), 1, dictionary='test_words.txt'))
+        self.assertEqual(True, boggle_instance.find_word('ADGJMPS147852TQNKHEBCFILOR0369'))
+        self.assertEqual(True, boggle_instance.find_word('AEIKMQ024'))
+        self.assertEqual(True, boggle_instance.find_word('NLKJMPQRO'))
+        self.assertEqual(False, boggle_instance.find_word('LKNOP'))
+        self.assertEqual(False, boggle_instance.find_word('AADE'))
 
 
 class HelperMethods:
@@ -165,7 +258,7 @@ class TestHelperMethods(unittest.TestCase):
     def test_map_string_array_to_board(self):
         test_string = 'abcdefghijklmnop'
         string_array = HelperMethods.generate_string_array(test_string, 4, 4)
-        boggle_instance = Boggle((4, 4), 1)
+        boggle_instance = TestableBoggle((4, 4), 1, dictionary='test_words.txt')
         boggle_instance_tl_mod = HelperMethods.map_string_array_to_board(string_array, boggle_instance)
         for r_idx, row in enumerate(string_array):
             for c_idx, column in enumerate(row):
