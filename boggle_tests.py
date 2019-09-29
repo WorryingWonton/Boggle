@@ -207,6 +207,26 @@ class TestIfValidBoggle(unittest.TestCase):
         self.assertEqual(False, boggle_instance.find_word('AADE'))
 
 
+class TestIfValidEnglish(unittest.TestCase):
+
+    def test_if_valid_english(self):
+        """
+        Tests that Boggle will accept words that are valid english and above the minimum length (as set by the scoring model)
+        Note:  My code will not accept words with more letters than there are spaces on the Board.
+        :return:
+        """
+        valid_words = ['obsequious', 'sycophantic', 'obese', 'pigeon', 'hole', 'pigeonholed', 'and', 'onomatopoeia']
+        invalid_words = ['am', 'to', 'me', 'i', 'a', 'an', 'meldspar']
+        boggle_instance = TestableBoggle((10, 10), 1)
+        for word in valid_words:
+            self.assertEqual(True, boggle_instance.check_if_valid_english(word))
+        for word in invalid_words:
+            self.assertEqual(False, boggle_instance.check_if_valid_english(word))
+
+
+
+
+
 class HelperMethods:
 
     @staticmethod
