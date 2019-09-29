@@ -6,7 +6,7 @@ from itertools import permutations
 I want to fully validate my Boggle code.
 I should test:
     -There is a way to verify is a word is correct per the rules of Boggle for a variety of board sizes, aspect ratios and alphabets
-    -There is a mechanism for verifying that a word is valid english, and that said word is soored according to a pre-supplied model
+    -There is a mechanism for verifying that a word is valid english, and that said word is scored according to a pre-supplied model
     -That the same word chosen by two or more players will not count towards their score
     -That the game will run for a pre-set number of rounds
     -That the game supports one or more players
@@ -217,14 +217,27 @@ class TestIfValidEnglish(unittest.TestCase):
         """
         valid_words = ['obsequious', 'sycophantic', 'obese', 'pigeon', 'hole', 'pigeonholed', 'and', 'onomatopoeia']
         invalid_words = ['am', 'to', 'me', 'i', 'a', 'an', 'meldspar']
-        boggle_instance = TestableBoggle((10, 10), 1)
+        boggle_instance = TestableBoggle((10, 10), 1, dictionary='boggle_words.txt', scoring_model=[(0, 0), (3, 1), (4, 1), (5, 2), (6, 3), (7, 5), (8, 11)])
         for word in valid_words:
             self.assertEqual(True, boggle_instance.check_if_valid_english(word))
         for word in invalid_words:
             self.assertEqual(False, boggle_instance.check_if_valid_english(word))
 
 
+class TestScoringSystem(unittest.TestCase):
+    """
+    This verifies two pieces of functionality relating to scoring words:
+        1.  Words are scored correctly based on the scoring model supplied.
+        2.  The same word supplied by two or more players during a round will not count towards any of their scores.
+    """
+    def test_word_scoring(self):
+        boggle_instance = TestableBoggle((10, 10), 1, dictionary='test_words.txt', scoring_model=[(0, 0), (3, 1), (4, 1), (5, 2), (6, 3), (7, 5), (8, 11)])
+        test_strings = {'': 0, '1': 0, '12': 0, '123': 1, '1234': 1, '12345': 2, '123456': 3, '1234567': 5, '12345678': 11, '123456789': 11}
+        for word in test_strings.keys():
+            self.assertEqual(test_strings[word], boggle_instance.score_word(word))
 
+    def test_round_scoring(self):
+        pass
 
 
 class HelperMethods:
