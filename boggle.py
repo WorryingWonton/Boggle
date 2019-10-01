@@ -54,8 +54,8 @@ class Boggle:
         self.interface.display_board()
         self.interface.display_scores()
         words = self.interface.get_words(active_player)
-        for idx, word in enumerate(words):
-            if self.find_word(words[idx]):
+        for word in words:
+            if self.find_word(word):
                 active_player.words[self.current_round][word] = self.score_word(word)
 
     def find_word(self, word):
@@ -199,6 +199,6 @@ class Cube:
 
 
 if __name__ == '__main__':
-    game = Boggle(grid_size=(20, 2), max_rounds=1, max_players=1)
+    game = Boggle(grid_size=(6, 6), max_rounds=2, max_players=2)
     game.add_players()
     game.run_game()
