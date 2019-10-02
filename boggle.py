@@ -27,7 +27,7 @@ class Boggle:
 
     def build_boggle_words(self):
         words = open(self.dictionary, 'r').read().split('\n')
-        return {x.lower() for x in words if self.scoring_model[1][0] <= len(x) <= 2 * self.x_width * self.y_width}
+        return {x.lower() for x in words if self.scoring_model[1][0] <= len(x) <= self.x_width * self.y_width}
 
     def add_players(self):
         names = self.interface.get_player_names()
