@@ -1,5 +1,5 @@
 import unittest
-from boggle import Boggle
+from boggle import Boggle, Player
 from itertools import permutations
 
 """
@@ -8,9 +8,7 @@ I should test:
     -There is a way to verify is a word is correct per the rules of Boggle for a variety of board sizes, aspect ratios and alphabets
     -There is a mechanism for verifying that a word is valid english, and that said word is scored according to a pre-supplied model
     -That the same word chosen by two or more players will not count towards their score
-    -That the game will run for a pre-set number of rounds
     -That the game supports one or more players
-    -That the game will return the winning Player's name and score after the last round has expired.
 """
 
 
@@ -237,7 +235,40 @@ class TestScoringSystem(unittest.TestCase):
             self.assertEqual(test_strings[word], boggle_instance.score_word(word))
 
     def test_round_scoring(self):
-        pass
+        """
+        The tests in this method have the side effect of validating that Boggle supports more than one Player
+        :return:
+        """
+        boggle_instance = TestableBoggle((10, 10), 2, dictionary='boggle_words.txt')
+        boggle_instance.players = [Player('Billy'), Player('Sally')]
+        billys_words = ['hello', 'lemming', 'pneumatic']
+        sallys_words = ['here', 'there', 'everywhere']
+        for player in boggle_instance.players:
+            player.build_score_dict(2)
+        for word in billys_words:
+            boggle_instance.players[0].words[boggle_instance.current_round][word] = boggle_instance.score_word(word)
+        for word in sallys_words:
+            boggle_instance.players[1].words[boggle_instance.current_round][word] = boggle_instance.score_word(word)
+        boggle_instance.score_round()
+        self.assertEqual(18, boggle_instance.players[0].score)
+        self.assertEqual(14, boggle_instance.players[1].score)
+        """
+        The below tests verify that when two players choose the same word, that word does not count towards either of their scores.
+        """
+        self.assertEqual({0: {'hello': 2, 'lemming': 5, 'pneumatic': 11}, 1: {}}, boggle_instance.players[0].words)
+        self.assertEqual({0: {'here': 1, 'there': 2, 'everywhere': 11}, 1: {}}, boggle_instance.players[1].words)
+        billys_words = ['nowhere', 'near', 'right']
+        sallys_words = ['somewhere', 'anywhere', 'far', 'near', 'massing']
+        boggle_instance.current_round += 1
+        for word in billys_words:
+            boggle_instance.players[0].words[boggle_instance.current_round][word] = boggle_instance.score_word(word)
+        for word in sallys_words:
+            boggle_instance.players[1].words[boggle_instance.current_round][word] = boggle_instance.score_word(word)
+        boggle_instance.score_round()
+        self.assertEqual(25, boggle_instance.players[0].score)
+        self.assertEqual(42, boggle_instance.players[1].score)
+        self.assertEqual({0: {'hello': 2, 'lemming': 5, 'pneumatic': 11}, 1: {'nowhere': 5, 'near': 0, 'right': 2}}, boggle_instance.players[0].words)
+        self.assertEqual({0: {'here': 1, 'there': 2, 'everywhere': 11}, 1: {'somewhere': 11, 'anywhere': 11, 'far': 1, 'near': 0, 'massing': 5}}, boggle_instance.players[1].words)
 
 
 class HelperMethods:
